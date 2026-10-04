@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>媽咪獨家邨巴</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="媽咪獨家🥰">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#E8ECEA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1311" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+html { -webkit-text-size-adjust: 100%; color-scheme: light; background: #E8ECEA; }
+body { margin: 0; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { background: #0E1311; } }
+</style>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap">
+<style>
+:root {
+  /* Layout: route sign and live clock on top, then three stop boards, each with its own countdown */
+  --bg: #E8ECEA;
+  --surface: #F5F7F6;
+  --ink: #13201C;
+  --muted: #586964;
+  --line: #C6CFCB;
+  --soft: #DCE3E0;
+  --accent: #C2410C;
+  --accent-ink: #FFFFFF;
+  --via: #0E7490;
+  --f-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f-body: 'Noto Sans HK', 'PingFang HK', 'Microsoft JhengHei', system-ui, sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1311; --surface: #161D1A; --ink: #E5ECE8; --muted: #8FA09A; --line: #27312D;
+    --soft: #1F2824; --accent: #FFB224; --accent-ink: #1A1100; --via: #5CC8E0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1311; --surface: #161D1A; --ink: #E5ECE8; --muted: #8FA09A; --line: #27312D;
+  --soft: #1F2824; --accent: #FFB224; --accent-ink: #1A1100; --via: #5CC8E0;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 20px 32px;
+}
+main { max-width: 1080px; margin-inline: auto; display: flex; flex-direction: column; gap: 20px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; }
+.route { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.sign {
+  font-family: var(--f-display); font-weight: 700; font-size: 2.8rem; line-height: 1;
+  letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink);
+  padding: 6px 12px 4px; border-radius: 4px;
+}
+.names { min-width: 0; display: flex; flex-direction: column; }
+.names b { font-weight: 700; font-size: 1.05rem; }
+.names span { color: var(--muted); font-size: 0.85rem; }
+.clock { text-align: right; }
+.clock .t { font-family: var(--f-mono); font-weight: 600; font-size: clamp(2.1rem, 7vw, 3rem); line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.clock .ap { font-size: 0.45em; margin-right: 0.25em; color: var(--muted); font-weight: 500; }
+.clock .d { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button {
+  font: inherit; font-size: 0.85rem; color: var(--ink); background: transparent; border: 0;
+  padding: 7px 12px; cursor: pointer; border-right: 1px solid var(--line);
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.showing { color: var(--muted); font-size: 0.85rem; }
+
+.stops { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 16px; align-items: start; }
+.stop { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.from { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
+.sname { display: flex; flex-direction: column; margin-top: 2px; }
+.sname b { font-size: 1.25rem; font-weight: 700; }
+.sname span { color: var(--muted); font-size: 0.9rem; }
+
+.big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 6px; }
+.big .n { font-family: var(--f-mono); font-weight: 600; font-size: clamp(3.4rem, 14vw, 4.4rem); line-height: 1; font-variant-numeric: tabular-nums; }
+.big .u { font-family: var(--f-body); font-weight: 500; font-size: 1.05rem; letter-spacing: 0; color: var(--muted); margin-right: 8px; }
+.big .s { font-family: var(--f-mono); font-weight: 500; font-size: 1.5rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.soon .big .n { color: var(--accent); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.9rem; }
+.meta b { font-weight: 600; }
+.pill { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--soft); color: var(--ink); white-space: nowrap; }
+.pill.via { background: transparent; color: var(--via); border: 1px solid var(--via); }
+
+.then { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.then li { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.then .tm { font-family: var(--f-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+.then .in { font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); min-width: 5.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.lab { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.04em; }
+
+details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; }
+details[open] summary { margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: 0.78rem; padding: 3px 7px; border-radius: 4px; background: var(--soft); font-variant-numeric: tabular-nums; }
+.chip.past { opacity: 0.4; }
+.chip.next { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.legend { color: var(--muted); font-size: 0.78rem; margin-top: 8px; }
+
+footer { color: var(--muted); font-size: 0.8rem; display: flex; flex-direction: column; gap: 4px; }
+</style>
+
+<main>
+  <header class="top">
+    <div class="route">
+      <div class="sign">NR323</div>
+      <div class="names">
+        <b>麗城花園第三期邨巴</b>
+        <span>往返麗城花園第三期及荃灣地鐵站</span>
+      </div>
+    </div>
+    <div class="clock" aria-live="off">
+      <div class="t"><span class="ap" id="clkap"></span><span id="clk">--:--:--</span></div>
+      <div class="d" id="clkd">香港時間</div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Timetable day type">
+      <button type="button" id="m-auto" data-mode="auto" aria-pressed="true">自動</button>
+      <button type="button" id="m-week" data-mode="week" aria-pressed="false">星期一至六</button>
+      <button type="button" id="m-sun" data-mode="sun" aria-pressed="false">星期日及公眾假期</button>
+    </div>
+    <div class="showing" id="showing"></div>
+  </div>
+
+  <section class="stops" id="stops"></section>
+
+  <footer>
+    <span>* 經街市。時間表為 2013 年 11 月 1 日起修訂版本，實際班次或因交通情況而有所不同。</span>
+    <span>風暴安排：八號風球懸掛後一小時，邨巴停駛；八號風球除下後一個半小時內，邨巴恢復行駛。</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // Times are 24h "h:mm"; a trailing * means the bus goes via Tsuen Wan Market.
+  var DATA = {
+    week: {
+      bel: [
+        ["6:50 7:10 7:35 8:00 8:25 8:50 9:15 9:40* 10:10* 10:40* 11:10* 11:40* 12:15 14:00 14:30 14:55* 15:25* 15:55* 16:25* 16:55* 17:30 18:00 18:25 18:50 19:15 19:40", 1],
+        ["7:00 7:25 7:50 8:15 8:40 9:05 9:30 9:55* 10:25* 10:55* 11:25* 11:55* 12:30 13:00 13:30 15:10* 15:40* 16:10* 16:40* 17:10* 17:45 18:10 18:35 19:00 19:25 19:50", 2]
+      ],
+      mtr: [
+        ["6:55 7:15 7:40 8:05 8:30 8:55 9:20 9:45* 10:15* 10:45* 11:15* 11:45* 12:20 14:05 14:35 15:00* 15:30* 16:00* 16:30* 17:00* 17:35 18:05 18:30 18:55 19:20 19:45", 1],
+        ["7:05 7:30 7:55 8:20 8:45 9:10 9:35 10:00* 10:30* 11:00* 11:30* 12:00* 12:35 13:05 13:35 15:15* 15:45* 16:15* 16:45* 17:15* 17:50 18:15 18:40 19:05 19:30 19:55", 2]
+      ],
+      mkt: [
+        ["9:50 10:20 10:50 11:20 11:50 15:05 15:35 16:05 16:35 17:05", 1],
+        ["10:05 10:35 11:05 11:35 12:05 15:20 15:50 16:20 16:50 17:20", 2]
+      ]
+    },
+    sun: {
+      bel: [
+        ["8:30 9:25* 10:25* 11:25* 12:25* 14:25* 15:25* 16:25* 17:25* 18:25*", 1],
+        ["8:55* 9:55* 10:55* 11:55* 13:55* 14:55* 15:55* 16:55* 17:55* 18:55*", 2]
+      ],
+      mtr: [
+        ["8:35 9:30* 10:30* 11:30* 12:30* 14:30* 15:30* 16:30* 17:30* 18:30*", 1],
+        ["9:00* 10:00* 11:00* 12:00* 14:00* 15:00* 16:00* 17:00* 18:00* 19:00*", 2]
+      ],
+      mkt: [
+        ["9:35 10:35 11:35 12:35 14:35 15:35 16:35 17:35 18:35", 1],
+        ["9:05 10:05 11:05 12:05 14:05 15:05 16:05 17:05 18:05 19:05", 2]
+      ]
+    }
+  };
+
+  var STOPS = [
+    { id: "bel", zh: "麗城花園第三期", en: "Belvedere Garden Phase 3" },
+    { id: "mtr", zh: "荃灣地鐵站", en: "Tsuen Wan MTR Station" },
+    { id: "mkt", zh: "荃灣街市", en: "Tsuen Wan Market" }
+  ];
+
+  function parse(groups) {
+    var out = [];
+    groups.forEach(function (g) {
+      g[0].split(/\s+/).forEach(function (tok) {
+        var via = tok.charAt(tok.length - 1) === "*";
+        var p = tok.replace("*", "").split(":");
+        out.push({ t: +p[0] * 60 + +p[1], coach: g[1], via: via });
+      });
+    });
+    out.sort(function (a, b) { return a.t - b.t; });
+    return out;
+  }
+  var TT = {};
+  Object.keys(DATA).forEach(function (type) {
+    TT[type] = {};
+    STOPS.forEach(function (s) { TT[type][s.id] = parse(DATA[type][s.id]); });
+  });
+
+  var hkFmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Hong_Kong", hourCycle: "h23", weekday: "short", day: "numeric", month: "numeric",
+    hour: "numeric", minute: "numeric", second: "numeric"
+  });
+  var WD = { Sun: "日", Mon: "一", Tue: "二", Wed: "三", Thu: "四", Fri: "五", Sat: "六" };
+  function hkNow() {
+    var p = {};
+    hkFmt.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    return { h: +p.hour, m: +p.minute, s: +p.second, wd: p.weekday, day: p.day, mon: p.month };
+  }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function fmt12(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h >= 12 ? "下午" : "上午") + (h % 12 || 12) + ":" + pad(m);
+  }
+  function durBig(rem) {
+    var h = Math.floor(rem / 3600), m = Math.floor((rem % 3600) / 60), s = rem % 60;
+    if (h > 0) return '<span class="n">' + h + '</span><span class="u">時</span><span class="n">' + m + '</span><span class="u">分</span>';
+    return '<span class="n">' + m + '</span><span class="u">分</span><span class="s">' + pad(s) + '秒</span>';
+  }
+  function durText(rem) {
+    var h = Math.floor(rem / 3600), m = Math.floor((rem % 3600) / 60);
+    return h > 0 ? h + " 小時 " + m + " 分鐘" : m + " 分鐘";
+  }
+  function pills(d, isMkt) {
+    return '<span class="pill">第' + (d.coach === 1 ? "一" : "二") + '車</span>' + (d.via && !isMkt ? '<span class="pill via">經街市</span>' : "");
+  }
+
+  var mode = "auto";
+  try { var saved = localStorage.getItem("nr323-mode"); if (saved === "week" || saved === "sun") mode = saved; } catch (e) {}
+
+  var root = document.getElementById("stops");
+  var panels = {};
+  STOPS.forEach(function (s) {
+    var el = document.createElement("article");
+    el.className = "stop";
+    el.innerHTML =
+      '<div><div class="from">開出站</div><div class="sname"><b>' + s.zh + '</b></div></div>' +
+      '<div class="hero"><div class="lab">下一班</div><div class="big" aria-live="off"></div></div>' +
+      '<div class="meta"></div>' +
+      '<div><div class="lab" style="margin-bottom:4px">之後班次</div><ul class="then"></ul></div>' +
+      '<details><summary>全日班次</summary><div class="chips"></div><div class="legend">* 經街市</div></details>';
+    root.appendChild(el);
+    panels[s.id] = {
+      el: el,
+      big: el.querySelector(".big"),
+      meta: el.querySelector(".meta"),
+      then: el.querySelector(".then"),
+      chips: el.querySelector(".chips"),
+      key: ""
+    };
+  });
+
+  var lastSec = -1;
+  function render() {
+    var n = hkNow();
+    var nowSec = n.h * 3600 + n.m * 60 + n.s;
+    if (nowSec === lastSec) return;
+    lastSec = nowSec;
+
+    var h12 = n.h % 12 || 12;
+    document.getElementById("clk").textContent = h12 + ":" + pad(n.m) + ":" + pad(n.s);
+    document.getElementById("clkap").textContent = n.h >= 12 ? "下午" : "上午";
+    document.getElementById("clkd").textContent = n.mon + "月" + n.day + "日 星期" + WD[n.wd] + " · 香港時間";
+
+    var todayType = mode === "auto" ? (n.wd === "Sun" ? "sun" : "week") : mode;
+    var tmrType = mode === "auto" ? (n.wd === "Sat" ? "sun" : "week") : mode;
+    document.getElementById("showing").textContent =
+      "目前顯示：" + (todayType === "sun" ? "星期日及公眾假期" : "星期一至六（公眾假期除外）") + "時間表";
+
+    STOPS.forEach(function (s) {
+      var P = panels[s.id];
+      var isMkt = s.id === "mkt";
+      var list = TT[todayType][s.id];
+      var idx = -1;
+      for (var i = 0; i < list.length; i++) { if (list[i].t * 60 >= nowSec) { idx = i; break; } }
+
+      var items = [];
+      if (idx >= 0) for (var j = idx; j < list.length && items.length < 4; j++) items.push({ d: list[j], off: 0 });
+      var tmr = TT[tmrType][s.id];
+      for (var k = 0; k < tmr.length && items.length < 4; k++) items.push({ d: tmr[k], off: 1 });
+
+      var first = items[0];
+      var rem = first.d.t * 60 + first.off * 86400 - nowSec;
+      P.big.innerHTML = durBig(rem);
+      P.el.classList.toggle("soon", rem < 300);
+      P.meta.innerHTML =
+        '<b>' + (first.off ? "明日 " : "開出 ") + fmt12(first.d.t) + '</b>' + pills(first.d, isMkt);
+
+      P.then.innerHTML = items.slice(1).map(function (it) {
+        var r = it.d.t * 60 + it.off * 86400 - nowSec;
+        return '<li><span class="tm">' + (it.off ? "明日 " : "") + fmt12(it.d.t) + '</span><span>' + pills(it.d, isMkt) + '</span><span class="in">' + durText(r) + '</span></li>';
+      }).join("");
+
+      var key = todayType + ":" + idx;
+      if (key !== P.key) {
+        P.key = key;
+        P.chips.innerHTML = list.map(function (d, i) {
+          var cls = "chip" + (i === idx ? " next" : (idx === -1 || i < idx ? " past" : ""));
+          return '<span class="' + cls + '">' + fmt12(d.t).replace(" ", "") + (d.via && !isMkt ? "*" : "") + '</span>';
+        }).join("");
+      }
+    });
+  }
+
+  function setMode(m) {
+    mode = m;
+    try { localStorage.setItem("nr323-mode", m); } catch (e) {}
+    ["auto", "week", "sun"].forEach(function (x) {
+      document.getElementById("m-" + x).setAttribute("aria-pressed", x === m ? "true" : "false");
+    });
+    lastSec = -1;
+    Object.keys(panels).forEach(function (id) { panels[id].key = ""; });
+    render();
+  }
+  ["auto", "week", "sun"].forEach(function (x) {
+    document.getElementById("m-" + x).addEventListener("click", function () { setMode(x); });
+  });
+
+  setMode(mode);
+  setInterval(render, 250);
+  document.addEventListener("visibilitychange", function () { lastSec = -1; render(); });
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
